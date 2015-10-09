@@ -14,6 +14,18 @@ var User = (function User(_store) {
 		}
 	}
 
+	that.createNewUser = function (username, password, callback) {
+		if (userExists(username)) {
+		  callback({ taken: true });
+		} else {
+		  _store[username] = { 'username' : username,
+		             'password' : password,
+		             'tweets' : [],
+		             'following' : [] };
+		  callback(null);
+		}
+	};
+
 	that.findByUsername = function (username, callback) {
 		if (userExists(username)) {
 		  callback(null, getUser(username));
@@ -34,19 +46,6 @@ var User = (function User(_store) {
 		  callback(null, false);
 		}
 	}
-  
-	that.createNewUser = function (username, password, callback) {
-		if (userExists(username)) {
-		  callback({ taken: true });
-		} else {
-		  _store[username] = { 'username' : username,
-		             'password' : password,
-		             'tweets' : [],
-		             'following' : [] };
-		  callback(null);
-		}
-	};
-
 
 	that.addTweet = function(username, tweet, callback) {
 		if (userExists(username)) {
@@ -66,10 +65,10 @@ var User = (function User(_store) {
 		    var tweet = user.tweets[tweetId];
 		    callback(null, tweet);
 		  } else {
-		    callback({ msg : 'Invalid tweet. '});
+		    callback({ msg : 'Invalid tweet.'});
 		  }
 		} else {
-		  callback({ msg : 'Invalid user. '});
+		  callback({ msg : 'Invalid user.'});
 		}
 	};
 
@@ -79,6 +78,28 @@ var User = (function User(_store) {
 		  callback(null, user.tweets);
 		} else {
 		  callback({ msg : 'Invalid user.' });
+		}
+	}
+
+	that.getAllTweets = function(username, callback) {
+		if (userExists(username)) {
+            var allTweets = [];
+            for (var key in _store){
+                var user = getUser(key);
+                user.tweets.forEach(function(t){
+                    if (t.creator === username){
+                        t.canDelete = true;
+                    }
+                    else {
+                        t.canDelete = false;
+                    }
+                    console.log(t);
+                    allTweets.push(t);
+                });
+            }
+            callback(null, allTweets);
+		} else {
+		    callback({ msg : 'Invalid user.' });
 		}
 	}
 

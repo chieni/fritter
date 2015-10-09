@@ -28,7 +28,6 @@ var requireContent = function(req, res, next) {
 };
 
 var requireOwnership = function(req, res, next) {
-  console.log("THIS IS HAPPENING")
   if (!(req.currentUser.username === req.tweet.creator)) {
     utils.sendErrResponse(res, 404, 'Resource not found.');
   } else {
@@ -52,7 +51,7 @@ router.all('/:tweet', requireOwnership);
 router.post('*', requireContent);
 
 router.get('/', function(req, res) {
-  User.getTweets(req.currentUser.username, function(err, tweets) {
+  User.getAllTweets(req.currentUser.username, function(err, tweets) {
     if (err) {
       utils.sendErrResponse(res, 500, 'An unknown error occurred.');
     } else {
@@ -83,7 +82,6 @@ router.post('/', function(req, res) {
 });
 
 router.delete('/:tweet', function(req, res) {
-  console.log("KLDSJAFADKLSJFKLAS;JDFKLS;");
   User.removeTweet(
     req.currentUser.username, 
     req.tweet._id, 
