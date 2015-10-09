@@ -1,7 +1,8 @@
 var assert = require("assert");
 var User = require('../models/User')
 
-// User creation is the module under test
+// User creation is the module under test. This tests all of the functionality related
+// to the creation and lookup of users.
 describe('User creation', function(){
 
   // This tests the createNewUser function
@@ -23,6 +24,7 @@ describe('User creation', function(){
 
   });
 
+  // This tests the findByUsername function  
   describe('#findByUsername', function(){
 
     it ('should callback a user if the user exists', function(){
@@ -39,6 +41,7 @@ describe('User creation', function(){
 
   });
 
+  // This tests the verifyPassword function
   describe('#verifyPassword', function(){
 
     it('should callback(null, true) if the user exists and the password is corect', function(){
@@ -65,8 +68,11 @@ describe('User creation', function(){
   });
 });
 
+// Tweet creation is a module under test. It tests everything in the User model that is related
+// to the creation, lookup, and deletion of tweets.
 describe('Tweet creation', function(){
 
+  // This tests the addTweet function
   describe('#addTweet', function(){
 
     it('should callback an invalid msg if the user does not exist', function(){
@@ -89,6 +95,7 @@ describe('Tweet creation', function(){
 
   });
 
+  // This tests the getTweet function
   describe('#getTweet', function(){
 
     it('should callback(null, tweet) if user and tweet exist', function(){
@@ -113,6 +120,7 @@ describe('Tweet creation', function(){
 
   });
 
+   // This tests the getTweets function
   describe('#getTweets', function(){
 
     it('should callback with a list of tweets from the existing user', function(){
@@ -130,6 +138,7 @@ describe('Tweet creation', function(){
 
   });
 
+   // This tests the getAllTweets function
   describe('#getAllTweets', function(){
 
     it('should get all tweets if the current user exists', function(){
@@ -153,6 +162,7 @@ describe('Tweet creation', function(){
 
   });
 
+  // This tests the removeTweet function
   describe('#removeTweet', function(){
 
     it('should callback with null if the tweet id and user both exist', function(){
