@@ -1,5 +1,5 @@
 var assert = require("assert");
-var User = require('../fritter/models/User')
+var User = require('../models/User')
 
 // User creation is the module under test
 describe('User creation', function(){

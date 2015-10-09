@@ -55,7 +55,7 @@ templates['tweets'] = template({"1":function(container,depth0,helpers,partials,d
 
   return "<div id=\"tweets\">\n  <p>Welcome, "
     + container.escapeExpression(((helper = (helper = helpers.currentUser || (depth0 != null ? depth0.currentUser : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"currentUser","hash":{},"data":data}) : helper)))
-    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n\n  <h1>My Tweets</h1>\n\n"
+    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n\n  <h1>Tweets</h1>\n\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tweets : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "\n\n</div>\n";
 },"usePartial":true,"useData":true});
