@@ -51,7 +51,7 @@ app.use(function(req, res, next) {
   }
 });
 
-
+// Map paths to imported route handlers
 app.use('/', routes);
 app.use('/users', users);
 app.use('/tweets', tweets);

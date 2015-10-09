@@ -1,5 +1,8 @@
 // Wrap in an immediately invoked function expression.
 (function() {
+
+  // Submits the sign in form by making a post request when
+  // the submit button is clicked
   $(document).on('submit', '#signin-form', function(evt) {
       evt.preventDefault();
       $.post(
@@ -14,6 +17,8 @@
       });
   });
 
+  // Submits the register form by making a post request when
+  // the submit button is clicked
   $(document).on('submit', '#register-form', function(evt) {
       evt.preventDefault();
       var formData = helpers.getFormData(this);
@@ -34,6 +39,9 @@
       });
   });
 
+
+  // Logs the user out by making a post request when the
+  // log out link is clicked.
   $(document).on('click', '#logout-link', function(evt) {
       evt.preventDefault();
       $.post(

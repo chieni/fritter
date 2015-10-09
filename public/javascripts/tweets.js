@@ -1,5 +1,8 @@
 // Wrapped in an immediately invoked function expression.
 (function() {
+
+  // When the submit new tweet button is clicked, if the field has
+  // any input in it, a post request is made to create a new tweet.
   $(document).on('click', '#submit-new-tweet', function(evt) {
       var content = $('#new-tweet-input').val();
       if (content.trim().length === 0) {
@@ -17,6 +20,8 @@
       });
   });
 
+  // When the delete link is clicked (it is only displayed on tweets that the
+  // current user wrote), a delete request is made to delete the tweet.
   $(document).on('click', '.delete-tweet', function(evt) {
     var item = $(this).parent();
     var id = item.data('tweet-id');

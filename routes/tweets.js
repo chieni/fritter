@@ -27,6 +27,12 @@ var requireContent = function(req, res, next) {
   }
 };
 
+/*
+  Require ownership whenever accessing a particular note
+  This means that the client accessing the resource must be logged in
+  as the user that originally created the note. Clients who are not owners 
+  of this particular resource will receive a 404.
+*/
 var requireOwnership = function(req, res, next) {
   if (!(req.currentUser.username === req.tweet.creator)) {
     utils.sendErrResponse(res, 404, 'Resource not found.');
@@ -35,6 +41,10 @@ var requireOwnership = function(req, res, next) {
   }
 };
 
+/*
+  Grab a tweet from the store whenever one is referenced with an ID in the
+  request path (any routes defined with :tweet as a paramter).
+*/
 router.param('tweet', function(req, res, next, tweetId) {
   User.getTweet(req.currentUser.username, tweetId, function(err, tweet) {
     if (tweet) {
@@ -45,11 +55,27 @@ router.param('tweet', function(req, res, next, tweetId) {
     }
   });
 });
+
 // Register the middleware handlers above.
 router.all('*', requireAuthentication);
 router.all('/:tweet', requireOwnership);
 router.post('*', requireContent);
+/*
+  At this point, all requests are authenticated and checked:
+  1. Clients must be logged into some account
+  2. If accessing or modifying a specific resource, the client must own that note
+  3. Requests are well-formed
+*/
 
+/*
+  GET /tweets
+  No request parameters
+  Response:
+    - success: true if the server succeeded in getting the user's tweets
+    - content: on success, an object with a single field 'tweets', which contains a list of the
+    user's tweets
+    - err: on failure, an error message
+*/
 router.get('/', function(req, res) {
   User.getAllTweets(req.currentUser.username, function(err, tweets) {
     if (err) {
@@ -65,7 +91,7 @@ router.get('/', function(req, res) {
   Request body:
     - content: the content of the note
   Response:
-    - success: true if the server succeeded in recording the user's note
+    - success: true if the server succeeded in recording the user's tweets
     - err: on failure, an error message
 */
 router.post('/', function(req, res) {
@@ -81,6 +107,14 @@ router.post('/', function(req, res) {
   });
 });
 
+/*
+  DELETE /tweets/:tweet
+  Request parameters:
+    - tweet ID: the unique ID of the tweet within the logged in user's tweet collection
+  Response:
+    - success: true if the server succeeded in deleting the user's tweet
+    - err: on failure, an error message
+*/
 router.delete('/:tweet', function(req, res) {
   User.removeTweet(
     req.currentUser.username, 

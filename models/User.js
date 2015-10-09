@@ -1,7 +1,15 @@
+/*
+Data for each user is stored in memory instead of a database for part 1.
+*/
 var _store = {};
 
+/**
+	Create a User object. A User contains information about each user
+	for my Fritter application. It keeps track of what the username,
+	password, tweets, and users that they follow (not used in part 1).
+	@constructor
+**/
 var User = (function User(_store) {
-
 	var that = Object.create(User.prototype);
 
 	var userExists = function(username) {
@@ -14,6 +22,12 @@ var User = (function User(_store) {
 		}
 	}
 
+	/**
+		Creates a new user object, adding it to the user store.
+		@param {string} username the username of the user
+		@param {string} password the password of the user
+		@param callback
+	**/
 	that.createNewUser = function (username, password, callback) {
 		if (userExists(username)) {
 		  callback({ taken: true });
@@ -26,6 +40,11 @@ var User = (function User(_store) {
 		}
 	};
 
+	/**
+		Finds a user based on the given username, then returns the
+		user object within the callback.
+		@param {string} username the username to be searched for
+	**/
 	that.findByUsername = function (username, callback) {
 		if (userExists(username)) {
 		  callback(null, getUser(username));
@@ -34,6 +53,12 @@ var User = (function User(_store) {
 		}
 	}
 
+	/**
+		Verifies that the given password matches the user's actual password
+		@param {string} username the username of the user
+		@param {string} candidatepw the password that is being verified
+		@param callback
+	**/
 	that.verifyPassword = function(username, candidatepw, callback) {
 		if (userExists(username)) {
 		  var user = getUser(username);
@@ -47,6 +72,12 @@ var User = (function User(_store) {
 		}
 	}
 
+	/**
+		Adds a tweet for a given user.
+		@param {string} username the username of the user
+		@param {object} tweet, the tweet object containing tweet informatino
+		@param callback
+	**/
 	that.addTweet = function(username, tweet, callback) {
 		if (userExists(username)) {
 		  var user = getUser(username);
@@ -58,6 +89,12 @@ var User = (function User(_store) {
 		}
 	};
 
+	/**
+		Retrieves a tweet based on the username and tweet id.
+		@param {string} username the username of the user
+		@param {int} id of the tweet being searched for
+		@param callback
+	**/
 	that.getTweet = function(username, tweetId, callback) {
 		if (userExists(username)) {
 		  var user = getUser(username);
@@ -72,6 +109,11 @@ var User = (function User(_store) {
 		}
 	};
 
+	/**
+		Retrieves all tweets for a user based on the username
+		@param {string} username the username of the user
+		@param callback
+	**/
 	that.getTweets = function(username, callback) {
 		if (userExists(username)) {
 		  var user = getUser(username);
@@ -81,6 +123,12 @@ var User = (function User(_store) {
 		}
 	}
 
+	/**
+		Retrieves all tweets for all users, also populating the
+		canDelete field for each tweet.
+		@param {string} username the username of the user
+		@param callback
+	**/
 	that.getAllTweets = function(username, callback) {
 		if (userExists(username)) {
             var allTweets = [];
@@ -103,6 +151,11 @@ var User = (function User(_store) {
 		}
 	}
 
+	/**
+		Removes a tweet for a user.
+		@param {string} username the username of the uesr
+		@param {int} tweetId the id of the tweet being removed
+	**/
 	that.removeTweet = function(username, tweetId, callback) {
 		if (userExists(username)) {
 		  var tweets = getUser(username).tweets;
