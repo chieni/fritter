@@ -8,7 +8,6 @@ var loadPage = function(template, data) {
 };
 
 var loadHomePage = function() {
-	console.log(currentUser);
 	if (currentUser) {
 		loadTweetsPage();
 	} else {

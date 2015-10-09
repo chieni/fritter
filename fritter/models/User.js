@@ -48,10 +48,49 @@ var User = (function User(_store) {
 	};
 
 
+	that.addTweet = function(username, tweet, callback) {
+		if (userExists(username)) {
+		  var user = getUser(username);
+		  tweet._id = user.tweets.length;
+		  user.tweets.push(tweet);
+		  callback(null);
+		} else {
+		  callback({ msg : 'Invalid user.' });
+		}
+	};
+
+	that.getTweet = function(username, tweetId, callback) {
+		if (userExists(username)) {
+		  var user = getUser(username);
+		  if (user.tweets[tweetId]) {
+		    var tweet = user.tweets[tweetId];
+		    callback(null, tweet);
+		  } else {
+		    callback({ msg : 'Invalid tweet. '});
+		  }
+		} else {
+		  callback({ msg : 'Invalid user. '});
+		}
+	};
+
 	that.getTweets = function(username, callback) {
 		if (userExists(username)) {
 		  var user = getUser(username);
 		  callback(null, user.tweets);
+		} else {
+		  callback({ msg : 'Invalid user.' });
+		}
+	}
+
+	that.removeTweet = function(username, tweetId, callback) {
+		if (userExists(username)) {
+		  var tweets = getUser(username).tweets;
+		  if (tweets[tweetId]) {
+		    delete tweets[tweetId];
+		    callback(null);
+		  } else {
+		    callback({ msg : 'Invalid tweet.' });
+		  }
 		} else {
 		  callback({ msg : 'Invalid user.' });
 		}

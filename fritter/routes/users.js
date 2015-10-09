@@ -44,7 +44,6 @@ router.post('/login', function(req, res) {
   }
 
   User.verifyPassword(req.body.username, req.body.password, function(err, match) {
-    console.log(req.body.username);
     if (match) {
       req.session.username = req.body.username;
       utils.sendSuccessResponse(res, { user : req.body.username });
@@ -93,7 +92,6 @@ router.post('/', function(req, res) {
   if (isLoggedInOrInvalidBody(req, res)) {
     return;
   }
-  console.log(req.body.username);
   User.createNewUser(req.body.username, req.body.password, 
     function(err) {
       if (err) {

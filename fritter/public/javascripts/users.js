@@ -15,8 +15,6 @@
   });
 
   $(document).on('submit', '#register-form', function(evt) {
-    console.log("ADSFKLJASDKLJ")
-      console.log(formData);
       evt.preventDefault();
       var formData = helpers.getFormData(this);
       console.log(formData);
