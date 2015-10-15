@@ -1,5 +1,13 @@
 var assert = require("assert");
-var User = require('../models/User')
+var User = require('../models/User');
+var Tweet = require('../models/Tweet');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+    console.log("database connected");
+});
 
 // User creation is the module under test. This tests all of the functionality related
 // to the creation and lookup of users.
@@ -11,6 +19,7 @@ describe('User creation', function(){
     it('should callback null if username does not exist, and create the user', function(){
       User.createNewUser('NewUser', 'password', 
         function(err) {
+          console.log("DORP")
           assert.equal(err, null);
       });
     });
@@ -29,6 +38,7 @@ describe('User creation', function(){
 
     it ('should callback a user if the user exists', function(){
       User.findByUsername('NewUser', function(err, user){
+        console.log(user);
         assert.equal(user.username, 'NewUser');
       });
     });
@@ -87,6 +97,7 @@ describe('Tweet creation', function(){
       });
 
       User.getTweet('NewUser', 0, function(err, tweet){
+        console.log(tweet)
         assert.equal(err, null);
         assert.equal(tweet.creator, 'NewUser');
       });

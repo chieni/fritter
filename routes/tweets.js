@@ -28,9 +28,9 @@ var requireContent = function(req, res, next) {
 };
 
 /*
-  Require ownership whenever accessing a particular note
+  Require ownership whenever accessing a particular tweet
   This means that the client accessing the resource must be logged in
-  as the user that originally created the note. Clients who are not owners 
+  as the user that originally created the tweet. Clients who are not owners 
   of this particular resource will receive a 404.
 */
 var requireOwnership = function(req, res, next) {
@@ -63,7 +63,7 @@ router.post('*', requireContent);
 /*
   At this point, all requests are authenticated and checked:
   1. Clients must be logged into some account
-  2. If accessing or modifying a specific resource, the client must own that note
+  2. If accessing or modifying a specific resource, the client must own that tweet
   3. Requests are well-formed
 */
 
@@ -89,7 +89,7 @@ router.get('/', function(req, res) {
 /*
   POST /tweets
   Request body:
-    - content: the content of the note
+    - content: the content of the tweet
   Response:
     - success: true if the server succeeded in recording the user's tweets
     - err: on failure, an error message
@@ -100,7 +100,7 @@ router.post('/', function(req, res) {
     creator: req.currentUser.username
   }, function(err, tweet) {
     if (err) {
-      utils.sendErrResponse(res, 500, 'An unknown error occurred.');
+      utils.sendErrResponse(res, 500, err.msg);
     } else {
       utils.sendSuccessResponse(res);
     }

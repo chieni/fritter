@@ -11,10 +11,23 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var tweets = require('./routes/tweets');
 
-// Import User model
+// Import models
 var User = require('./models/User')
+var Counter = require('./models/Counter');
+
+// Start database
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/fritter-db');
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+    console.log("database connected");
+});
 
 var app = express();
+Counter.initialize(function(err, record){
+  if (record) { console.log(record);}
+}); 
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

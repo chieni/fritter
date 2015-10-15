@@ -1,25 +1,43 @@
-/*
-Data for each user is stored in memory instead of a database for part 1.
-*/
-var _store = {};
-
 /**
 	Create a User object. A User contains information about each user
 	for my Fritter application. It keeps track of what the username,
 	password, tweets, and users that they follow (not used in part 1).
 	@constructor
 **/
-var User = (function User(_store) {
+var User = (function User() {
 	var that = Object.create(User.prototype);
+	var mongoose = require('mongoose');
+	var Tweet = require('../models/Tweet');
 
-	var userExists = function(username) {
-		return _store[username] !== undefined;
+	var userSchema = mongoose.Schema({
+		_id: Number,
+		username: String,
+		password: String,
+		tweet_ids: [Number],
+		follow_ids: [Number]
+
+	});
+
+	var UserModel = mongoose.model("UserModel", userSchema);
+
+	var userExists = function(username, callback) {
+		UserModel.findOne({username: username}, function(err, doc){
+			if (doc){
+				callback(true);
+			} else {
+				callback(false);
+			}
+		});
 	}
 
-	var getUser = function(username) {
-		if (userExists(username)) {
-		  return _store[username];
-		}
+	var getUser = function(username, callback) {
+		userExists(username, function(exists){
+			if (exists){
+				UserModel.findOne({username: username}, function(err, doc){
+					callback(doc);
+				});
+			}
+		});
 	}
 
 	/**
@@ -29,28 +47,47 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.createNewUser = function (username, password, callback) {
-		if (userExists(username)) {
-		  callback({ taken: true });
-		} else {
-		  _store[username] = { 'username' : username,
-		             'password' : password,
-		             'tweets' : [],
-		             'following' : [] };
-		  callback(null);
-		}
+		userExists(username, function(exists){
+			if (exists){
+				callback({ taken: true });
+			} else {
+				UserModel.count({}, function(err, count){
+					UserModel.create({
+						_id: count,
+						username: username,
+						password: password,
+						tweet_ids: [],
+						follow_ids: []
+					}, function(err, record){
+						if (err) {
+							console.log(err)
+						} else {
+							callback(null);
+						}
+					});
+				});
+			}
+		});
 	};
-
 	/**
 		Finds a user based on the given username, then returns the
 		user object within the callback.
 		@param {string} username the username to be searched for
 	**/
 	that.findByUsername = function (username, callback) {
-		if (userExists(username)) {
-		  callback(null, getUser(username));
-		} else {
-		  callback({ msg : 'No such user!' });
-		}
+		userExists(username, function(exists){
+			if (exists){
+				getUser(username, function(user){
+					if (user){
+						callback(null, user);
+					} else {
+						callback({ msg : 'No such user!' });
+					}
+				});
+			} else {
+				callback({ msg : 'No such user!' });
+			}
+		});
 	}
 
 	/**
@@ -60,17 +97,20 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.verifyPassword = function(username, candidatepw, callback) {
-		if (userExists(username)) {
-		  var user = getUser(username);
-		  if (candidatepw === user.password) {
-		    callback(null, true);
-		  } else {
-		    callback(null, false);
-		  }
-		} else {
-		  callback(null, false);
-		}
-	}
+		userExists(username, function(exists){
+			if (exists) {
+				getUser(username, function(user){
+				  if (candidatepw === user.password) {
+				    callback(null, true);
+				  } else {
+				    callback(null, false);
+				  }
+				});
+			} else {
+			  callback(null, false);
+			}
+		});
+	};
 
 	/**
 		Adds a tweet for a given user.
@@ -79,14 +119,21 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.addTweet = function(username, tweet, callback) {
-		if (userExists(username)) {
-		  var user = getUser(username);
-		  tweet._id = user.tweets.length;
-		  user.tweets.push(tweet);
-		  callback(null);
-		} else {
-		  callback({ msg : 'Invalid user.' });
-		}
+		userExists(username, function(exists){
+			if (exists) {
+				getUser(username, function(user){
+					Tweet.addTweet(tweet, function(success){
+						if (success){
+							callback(null);
+						} else {
+							callback({msg: 'Failed.'});
+						}
+					});
+				});
+			} else {
+			  callback({ msg : 'Invalid user.' });
+			}
+		});
 	};
 
 	/**
@@ -96,17 +143,21 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.getTweet = function(username, tweetId, callback) {
-		if (userExists(username)) {
-		  var user = getUser(username);
-		  if (user.tweets[tweetId]) {
-		    var tweet = user.tweets[tweetId];
-		    callback(null, tweet);
-		  } else {
-		    callback({ msg : 'Invalid tweet.'});
-		  }
-		} else {
-		  callback({ msg : 'Invalid user.'});
-		}
+		userExists(username, function(exists){
+			if (exists) {
+			  Tweet.getTweet(tweetId, function(tweet){
+			  	if (tweet) {
+			  		callback(null, tweet);
+			  	} else {
+			  		callback( {msg: 'Invalid tweet.'});
+			  	}
+			  });
+			} else {
+			  callback({ msg : 'Invalid user.'});
+			}
+		});
+
+
 	};
 
 	/**
@@ -115,12 +166,20 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.getTweets = function(username, callback) {
-		if (userExists(username)) {
-		  var user = getUser(username);
-		  callback(null, user.tweets);
-		} else {
-		  callback({ msg : 'Invalid user.' });
-		}
+		userExists(username, function(exists){
+			if (exists) {
+				Tweet.getUserTweets(username, function(tweets){
+					if (tweets){
+						callback(null, tweets);
+					} else {
+						callback({ msg : 'Invalid user.' });
+					}
+				});
+					
+			} else {
+			  callback({ msg : 'Invalid user.' });
+			}
+		});
 	}
 
 	/**
@@ -130,26 +189,16 @@ var User = (function User(_store) {
 		@param callback
 	**/
 	that.getAllTweets = function(username, callback) {
-		if (userExists(username)) {
-            var allTweets = [];
-            for (var key in _store){
-                var user = getUser(key);
-                user.tweets.forEach(function(t){
-                    if (t.creator === username){
-                        t.canDelete = true;
-                    }
-                    else {
-                        t.canDelete = false;
-                    }
-                    console.log(t);
-                    allTweets.push(t);
-                });
-            }
-            callback(null, allTweets);
-		} else {
-		    callback({ msg : 'Invalid user.' });
-		}
-	}
+		userExists(username, function(exists){
+			if (exists){
+				Tweet.getAllTweets(username, function(tweets){
+					callback(false, tweets);
+				})
+			} else {
+				callback(true, { msg : 'Invalid user.' });
+			}
+		});
+	};
 
 	/**
 		Removes a tweet for a user.
@@ -157,22 +206,24 @@ var User = (function User(_store) {
 		@param {int} tweetId the id of the tweet being removed
 	**/
 	that.removeTweet = function(username, tweetId, callback) {
-		if (userExists(username)) {
-		  var tweets = getUser(username).tweets;
-		  if (tweets[tweetId]) {
-		    delete tweets[tweetId];
-		    callback(null);
-		  } else {
-		    callback({ msg : 'Invalid tweet.' });
-		  }
-		} else {
-		  callback({ msg : 'Invalid user.' });
-		}
-	}
+		userExists(username, function(exists){
+			if (exists) {
+				Tweet.removeTweet(tweetId, function(success){
+					if (success){
+						callback(null);
+					} else {
+						callback({ msg : 'Invalid tweet.' });
+					}
+				})
+			} else {
+				callback({ msg : 'Invalid user.' });
+			}
+		});
+	};
 
 
 	Object.freeze(that);
 	return that;
-})(_store);
+})();
 
 module.exports = User;
