@@ -139,14 +139,18 @@ var Tweet = (function Tweet(){
 			queryArray.push({reblogger:followUsername});
 		});
 
-		TweetModel.find({$or : queryArray }, function(err, tweets){
-			if (err){
-				callback(true);
-			} else {
-				callback(false, tweets);
-			}
-			
-		});
+		if (queryArray.length > 0){
+			TweetModel.find({$or : queryArray }, function(err, tweets){
+				if (err){
+					callback(true);
+				} else {
+					callback(false, tweets);
+				}
+				
+			});
+		} else {
+			callback(false, []);
+		}
 	};
 
 	Object.freeze(that);
