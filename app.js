@@ -16,7 +16,7 @@ var User = require('./models/User')
 
 // Start database
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/fritter-db');
+mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/fritter-db');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
