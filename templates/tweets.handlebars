@@ -7,13 +7,15 @@
     <input type="text" id="new-tweet-input" />
     <button id="submit-new-tweet">Add</button>
   </div>
+  <div>
     <label for="follow-user-input">Follow user:</label>
     <input type="text" id="follow-user-input" />
     <button id="submit-follow">Follow</button>
-  <div>
+
     
   </div>
 
+<div class="left">
   <h1>All Tweets</h1>
 
   {{#each tweets}}
@@ -22,12 +24,16 @@
     <p><em>No tweets yet!</em></p>
   {{/each}}
 
+</div>
+
+<div class="right">
   <h1>Following Tweets</h1>
   {{#each followingTweets}}
     {{> tweet}}
   {{else}}
     <p><em>No tweets yet!</em></p>
   {{/each}}
+</div>
 
 
 </div>

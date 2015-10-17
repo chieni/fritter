@@ -79,10 +79,10 @@ templates['tweets'] = template({"1":function(container,depth0,helpers,partials,d
 
   return "<div id=\"tweets\">\n  <p>Welcome, "
     + container.escapeExpression(((helper = (helper = helpers.currentUser || (depth0 != null ? depth0.currentUser : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"currentUser","hash":{},"data":data}) : helper)))
-    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n    <label for=\"follow-user-input\">Follow user:</label>\n    <input type=\"text\" id=\"follow-user-input\" />\n    <button id=\"submit-follow\">Follow</button>\n  <div>\n    \n  </div>\n\n  <h1>All Tweets</h1>\n\n"
+    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n  <div>\n    <label for=\"follow-user-input\">Follow user:</label>\n    <input type=\"text\" id=\"follow-user-input\" />\n    <button id=\"submit-follow\">Follow</button>\n\n    \n  </div>\n\n<div class=\"left\">\n  <h1>All Tweets</h1>\n\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tweets : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
-    + "\n  <h1>Following Tweets</h1>\n"
+    + "\n</div>\n\n<div class=\"right\">\n  <h1>Following Tweets</h1>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.followingTweets : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
-    + "\n\n</div>\n";
+    + "</div>\n\n\n</div>\n";
 },"usePartial":true,"useData":true});
 })();
