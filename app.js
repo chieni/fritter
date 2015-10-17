@@ -21,6 +21,7 @@ mongoose.connect('mongodb://localhost/fritter-db');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
+  console.log('database connected');
   // mongoose.connection.db.dropDatabase(
   //   function (err, result) {
   //     if(err){ console.log(err); }
@@ -32,9 +33,6 @@ db.once('open', function (callback) {
 });
 
 var app = express();
-Counter.initialize(function(err, record){
-  if (record) { console.log(record);}
-}); 
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

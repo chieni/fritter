@@ -69,6 +69,14 @@ router.post('/logout', function(req, res) {
   }
 });
 
+/*
+  POST /users/follow
+  Request body: 
+    - toFollow
+  Response:
+    - success: true if follow succeeded; false otherwise
+    - err: on error, an error message
+*/
 router.post('/follow', function(req, res){
   User.followUser(req.currentUser.username, req.body.toFollow, function(err) {
     if (err) {

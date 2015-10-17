@@ -55,6 +55,8 @@
       });
   });
 
+  // Follows the creator of the tweet, or the reblogger if one exists once
+  // the follow link is clicked.
   $(document).on('click', '.follow-tweet', function(evt){
     evt.preventDefault();
     var item = $(this).parent();
@@ -75,6 +77,8 @@
       });
   });
 
+  // Follows the user based on the username given in the input field,
+  // if this user exists.
   $(document).on('click', '#submit-follow', function(evt) {
       var content = $('#follow-user-input').val();
       if (content.trim().length === 0) {

@@ -119,7 +119,7 @@ var User = (function User() {
 	/**
 		Retrieves a tweet based on the username and tweet id.
 		@param {string} username the username of the user
-		@param {int} id of the tweet being searched for
+		@param {ObjectID} id of the tweet being searched for
 		@param callback
 	**/
 	that.getTweet = function(username, tweetId, callback) {
@@ -179,8 +179,8 @@ var User = (function User() {
 
 	/**
 		Removes a tweet for a user.
-		@param {string} username the username of the uesr
-		@param {int} tweetId the id of the tweet being removed
+		@param {string} username the username of the user
+		@param {ObjectID} tweetId the id of the tweet being removed
 	**/
 	that.removeTweet = function(username, tweetId, callback) {
 		userExists(username, function(exists){
@@ -198,6 +198,11 @@ var User = (function User() {
 		});
 	};
 
+	/**
+		Follows a user.
+		@param {string} username the username of the user
+		@param {string} followUser the username of the user that is to be followed
+	**/
 	that.followUser = function(username, followUser, callback){
 		userExists(followUser, function(exists){
 			if (exists){
@@ -217,6 +222,10 @@ var User = (function User() {
 		});
 	};
 
+	/**
+		Retrieves the tweets from the users that the provided user is following.
+		@param{string} username the username of the user
+	**/
 	that.getFollowingTweets = function(username, callback){
 		getUser(username, function(user){
 			Tweet.getFollowingTweets(username, user.follows, function(tweets){
@@ -225,6 +234,11 @@ var User = (function User() {
 		});
 	};
 
+	/**
+		Retweets the tweet indicated by the tweet id
+		@param {string} username the username of the user
+		@param {ObjectID} tweetId the Mongo-provided id of the tweet to be retweeted
+	**/
 	that.retweet = function(username, tweetId, callback){
 		userExists(username, function(exists){
 			if (exists) {

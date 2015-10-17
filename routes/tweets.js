@@ -116,6 +116,14 @@ router.post('/', function(req, res) {
   });
 });
 
+/*
+  POST /tweets
+  Request body:
+    - content: the user to be followed
+  Response:
+    - success: true if the server succeeded in follow the given user
+    - err: on failure, an error message
+*/
 router.post('/retweet', function(req, res) {
   User.retweet(req.currentUser.username, req.body.content, function(err) {
     if (err) {
