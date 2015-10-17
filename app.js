@@ -13,7 +13,6 @@ var tweets = require('./routes/tweets');
 
 // Import models
 var User = require('./models/User')
-var Counter = require('./models/Counter');
 
 // Start database
 var mongoose = require('mongoose');

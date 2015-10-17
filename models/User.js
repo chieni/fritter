@@ -56,7 +56,7 @@ var User = (function User() {
 						follows: []
 					}, function(err, record){
 						if (err) {
-							console.log(err)
+							console.log(err);
 						} else {
 							callback(null);
 						}
@@ -97,6 +97,30 @@ var User = (function User() {
 	};
 
 	/**
+		Follows a user.
+		@param {string} username the username of the user
+		@param {string} followUser the username of the user that is to be followed
+	**/
+	that.followUser = function(username, followUser, callback){
+		userExists(followUser, function(exists){
+			if (exists){
+				UserModel.findOneAndUpdate({username:username},
+					{$push: {follows: followUser}}, 
+					{safe: true, upsert: true}, 
+						function(err, doc){
+						if (doc){
+							callback(null, doc);
+						} else {
+							callback({msg: 'Failed.'});
+						}
+				});
+			} else {
+				callback({msg: 'User does not exist.'});
+			}
+		});
+	};
+
+	/**
 		Adds a tweet for a given user.
 		@param {string} username the username of the user
 		@param {object} tweet, the tweet object containing tweet informatino
@@ -106,9 +130,9 @@ var User = (function User() {
 		getUser(username, function(user){
 			tweet.reblogger = "";
 			tweet.isRetweet = false;
-			Tweet.addTweet(tweet, function(success){
+			Tweet.addTweet(tweet, function(success, record){
 				if (success){
-					callback(null);
+					callback(null, record);
 				} else {
 					callback({msg: 'Failed.'});
 				}
@@ -169,11 +193,19 @@ var User = (function User() {
 	**/
 	that.getAllTweets = function(username, callback) {
 		getUser(username, function(user){
-				Tweet.getAllTweets(username, user.follows, function(tweets){
-					Tweet.getFollowingTweets(user.follows, function(followingTweets){
-						callback(false, tweets, followingTweets);
+			Tweet.getAllTweets(username, user.follows, function(err, tweets){
+				if (err){
+					callback({msg: 'Failed to retrieve all tweets.'})
+				} else {
+					Tweet.getFollowingTweets(user.follows, function(err, followingTweets){
+						if (err){
+							callback(err);
+						} else {
+							callback(false, tweets, followingTweets);
+						}
 					});
-				});
+				}
+			});
 		});
 	};
 
@@ -198,29 +230,6 @@ var User = (function User() {
 		});
 	};
 
-	/**
-		Follows a user.
-		@param {string} username the username of the user
-		@param {string} followUser the username of the user that is to be followed
-	**/
-	that.followUser = function(username, followUser, callback){
-		userExists(followUser, function(exists){
-			if (exists){
-				UserModel.findOneAndUpdate({username:username},
-					{$push: {follows: followUser}}, 
-					{safe: true, upsert: true}, 
-						function(err, doc){
-						if (doc){
-							callback(null);
-						} else {
-							callback({msg: 'Failed.'});
-						}
-				});
-			} else {
-				callback({msg: 'User does not exist.'});
-			}
-		});
-	};
 
 	/**
 		Retrieves the tweets from the users that the provided user is following.
@@ -228,8 +237,13 @@ var User = (function User() {
 	**/
 	that.getFollowingTweets = function(username, callback){
 		getUser(username, function(user){
-			Tweet.getFollowingTweets(username, user.follows, function(tweets){
-				callback(tweets);
+			Tweet.getFollowingTweets(username, user.follows, function(err, tweets){
+				if (err){
+					callback({msg: 'Failed to retrieve tweets'});
+				} else {
+					callback(null, tweets);
+				}
+				
 			});
 		});
 	};
@@ -252,9 +266,9 @@ var User = (function User() {
 						canFollow: false,
 						isRetweet: true
 			  		}
-					Tweet.addTweet(newTweet, function(success){
+					Tweet.addTweet(newTweet, function(success, record){
 						if (success){
-							callback(null);
+							callback(null, record);
 						} else {
 							callback({msg: 'Failed to retweet.'});
 						}

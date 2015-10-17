@@ -66,15 +66,15 @@
     if (reblogger.length > 0){
       toFollow = reblogger;
     }
-      $.post(
-          '/users/follow',
-          { toFollow: toFollow }
-      ).done(function(response) {
-          loadHomePage();
-      }).fail(function(responseObject) {
-          var response = $.parseJSON(responseObject.responseText);
-          $('.error').text(response.err);
-      });
+    $.post(
+        '/users/follow',
+        { toFollow: toFollow }
+    ).done(function(response) {
+        loadHomePage();
+    }).fail(function(responseObject) {
+        var response = $.parseJSON(responseObject.responseText);
+        $('.error').text(response.err);
+    });
   });
 
   // Follows the user based on the username given in the input field,

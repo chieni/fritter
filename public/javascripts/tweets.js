@@ -36,6 +36,8 @@
     });
   });
 
+  // When the retweet link is clicked, the tweet is retweeted in the format
+  // retweeter: @original-poster tweet content
   $(document).on('click', '.retweet', function(evt){
     evt.preventDefault();
     var item = $(this).parent();

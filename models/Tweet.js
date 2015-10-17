@@ -19,8 +19,6 @@ var Tweet = (function Tweet(){
 	});
 
 	var TweetModel = mongoose.model("TweetModel", tweetSchema);
-	var Counter = require('../models/Counter');
-
 	/**
 		Adds the tweet to the database collection of tweets.
 		@param {Object} the tweet to be added
@@ -28,11 +26,10 @@ var Tweet = (function Tweet(){
 	that.addTweet = function(tweet, callback){
 		tweet.canDelete = false;	
 		TweetModel.create(tweet, function(err, record){
-			console.log(err);
 			if (err){
 				callback(false);
 			} else {
-				callback(true);
+				callback(true, record);
 			}
 			
 		});
@@ -76,45 +73,49 @@ var Tweet = (function Tweet(){
  	**/
 	that.getAllTweets = function(username, follows, callback){
 		TweetModel.find({}, function(err, tweets){
-			tweets.forEach(function(t){
-				// if tweet creator (or reblogger if there is one) is not in follows already, show follow button
-			    if (t.isRetweet){
-			    	// reblogged tweet
-				    if (t.reblogger === username){
-	                    t.canDelete = true;
-	                }
-	                else {
-	                    t.canDelete = false;
-	                    // If it was rebloggged by someone other than you, you can follow the reblogger
-		                if (follows.indexOf(t.reblogger) > -1){
-		                	t.canFollow = false;
-		                } else {
-		                	t.canFollow = true;
+			if (err){
+				callback(true);
+			} else{
+				tweets.forEach(function(t){
+					// if tweet creator (or reblogger if there is one) is not in follows already, show follow button
+				    if (t.isRetweet){
+				    	// reblogged tweet
+					    if (t.reblogger === username){
+		                    t.canDelete = true;
 		                }
-	                }
-
-			    } else {
-			    	// normal tweet
-				    if (t.creator === username){
-	                    t.canDelete = true;
-	                }
-	                else {
-	                	 t.canDelete = false;
-	                	// If it was created by someone other than you, you can follow the creator
-	                	if (follows.indexOf(t.creator) > -1){
-		                	t.canFollow = false;
-		                } else {
-		                	t.canFollow = true;
-		                }	
-	                }
-			    }
-			});
-			callback(tweets);
+		                else {
+		                    t.canDelete = false;
+		                    // If it was rebloggged by someone other than you, you can follow the reblogger
+			                if (follows.indexOf(t.reblogger) > -1){
+			                	t.canFollow = false;
+			                } else {
+			                	t.canFollow = true;
+			                }
+		                }
+				    } else {
+				    	// normal tweet
+					    if (t.creator === username){
+		                    t.canDelete = true;
+		                }
+		                else {
+		                	 t.canDelete = false;
+		                	// If it was created by someone other than you, you can follow the creator
+		                	if (follows.indexOf(t.creator) > -1){
+			                	t.canFollow = false;
+			                } else {
+			                	t.canFollow = true;
+			                }	
+		                }
+				    }
+				});
+				callback(false, tweets);
+			}
 		});
 	}
 
 	/**
-		Deletes a tweet.
+		Deletes a tweet. If the tweet has retweets from it, those retweets
+		are not deleted and remain visible.
 		@param {ObjectID} tweetId the Mongo-provided id of the tweet
 	**/
 	that.removeTweet = function(tweetId, callback){
@@ -139,7 +140,12 @@ var Tweet = (function Tweet(){
 		});
 
 		TweetModel.find({$or : queryArray }, function(err, tweets){
-			callback(tweets);
+			if (err){
+				callback(true);
+			} else {
+				callback(false, tweets);
+			}
+			
 		});
 	};
 

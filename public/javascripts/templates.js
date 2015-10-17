@@ -34,11 +34,11 @@ templates['tweet'] = template({"1":function(container,depth0,helpers,partials,da
 
   return "  <span style=\"color:blue\">"
     + alias4(((helper = (helper = helpers.reblogger || (depth0 != null ? depth0.reblogger : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"reblogger","hash":{},"data":data}) : helper)))
-    + " </span> <span>: "
-    + alias4(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data}) : helper)))
-    + "</span>\n  <span style=\"color: orange\">Orignally by: </span> <span>  "
+    + " </span> : <span style=\"color: orange\"> @"
     + alias4(((helper = (helper = helpers.creator || (depth0 != null ? depth0.creator : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"creator","hash":{},"data":data}) : helper)))
-    + " </span>\n";
+    + " </span><span> "
+    + alias4(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data}) : helper)))
+    + "</span>\n  \n";
 },"3":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 

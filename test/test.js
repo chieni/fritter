@@ -6,9 +6,19 @@ mongoose.connect('mongodb://localhost/test');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
-    console.log("database connected");
+  mongoose.connection.db.dropDatabase(
+    function (err, result) {
+      if(err){ console.log(err); }
+      else {
+        console.log('database connected');
+      }
+    }
+  );
 });
 
+// global variables needed in order to retrieve Mongo Id's of tweets for testing purposes.
+var tweetId;
+var tweetIdOwn;
 // User creation is the module under test. This tests all of the functionality related
 // to the creation and lookup of users.
 describe('User creation', function(){
@@ -19,7 +29,6 @@ describe('User creation', function(){
     it('should callback null if username does not exist, and create the user', function(){
       User.createNewUser('NewUser', 'password', 
         function(err) {
-          console.log("DORP")
           assert.equal(err, null);
       });
     });
@@ -38,7 +47,6 @@ describe('User creation', function(){
 
     it ('should callback a user if the user exists', function(){
       User.findByUsername('NewUser', function(err, user){
-        console.log(user);
         assert.equal(user.username, 'NewUser');
       });
     });
@@ -76,10 +84,35 @@ describe('User creation', function(){
     });
 
   });
+
+
+  // This tests the followUser function
+  describe('#followUser', function(){
+    it ('should callback(null) when an existing user is followed successfully', function(){
+      User.createNewUser('NewUser2', 'password', 
+        function(err) {
+          assert.equal(err.taken, true);
+      });
+
+      User.followUser('NewUser', 'NewUser2', function(err, doc){
+        assert.equal(err, null);
+        assert.equal(doc.follows.indexOf('NewUser2') == 0);
+      })
+    });
+
+    it('should callback({msg: "User does not exist."}) when a user that does not existed is attempted to be followed', function(){
+      User.followUser('NewUser', 'FakeUser', function(err, doc){
+        assert.equal(err.msg, 'User does not exist.');
+      })
+    });
+
+  });
+
 });
 
 // Tweet creation is a module under test. It tests everything in the User model that is related
-// to the creation, lookup, and deletion of tweets.
+// to the creation, lookup, and deletion of tweets. Every method in the Tweet model is only accessed
+// via the User model, so the Tweet model is tested implicitly in the following tests.
 describe('Tweet creation', function(){
 
   // This tests the addTweet function
@@ -92,12 +125,12 @@ describe('Tweet creation', function(){
     });
 
     it('should successfully create a tweet if the user does exist', function(){
-      User.addTweet('NewUser', {content: 'First tweet ever!', creator: 'NewUser'}, function(err){
+      User.addTweet('NewUser', {content: 'First tweet ever!', creator: 'NewUser'}, function(err, record){
+        tweetIdOwn = record._id;
         assert.equal(err, null);
       });
 
       User.getTweet('NewUser', 0, function(err, tweet){
-        console.log(tweet)
         assert.equal(err, null);
         assert.equal(tweet.creator, 'NewUser');
       });
@@ -156,7 +189,8 @@ describe('Tweet creation', function(){
       User.createNewUser('NewUser2', 'password', 
         function(err) {
       });
-      User.addTweet('NewUser2', {content: 'First tweet ever!', creator: 'NewUser2'}, function(err){
+      User.addTweet('NewUser2', {content: 'First tweet ever!', creator: 'NewUser2'}, function(err, record){
+        tweetId = record._id;
       });
       User.getAllTweets('NewUser', function(err, tweets){
         assert.equal(tweets.length, 2);
@@ -192,6 +226,47 @@ describe('Tweet creation', function(){
       User.removeTweet('FakeUser',0, function(err){
         assert.equal(err.msg, 'Invalid user.');
       });
+    });
+
+  });
+
+  describe('#getFollowingTweets', function(){
+    it('should retrieve all the tweets for those a user is following', function(){
+      User.getFollowingTweets('NewUser', function(err, tweets){
+        assert(err, null);
+        assert(tweets[0].creator, 'NewUser2');
+        assert(tweets.length, 1);
+      })
+    });
+    it('should retrieve no tweets if the user isn\'t following anyone', function(){
+      User.getFollowingTweets('NewUser2', function(err, tweets){
+        assert(err, null);
+        assert(tweets.length, 0);
+      })
+    });
+  });
+
+  describe('#retweet', function(){
+    it('should retweet another user\'s tweet successfully', function(){
+      User.retweet('NewUser', tweetId, function(err, doc){
+        assert(err, null);
+        assert(doc.creator, 'NewUser2');
+        assert(doc.content, 'First tweet ever!');
+        assert(doc.reblogger, 'NewUser');
+        assert(doc.canFollow, false);
+        assert(doc.isRetweet, true);
+      })
+    });
+
+    it('should retweet a user\'s own tweet successfully', function(){
+      User.retweet('NewUser', tweetIdOwn, function(err, doc){
+        assert(err, null);
+        assert(doc.creator, 'NewUser2');
+        assert(doc.content, 'First tweet ever!');
+        assert(doc.reblogger, 'NewUser');
+        assert(doc.canFollow, false);
+        assert(doc.isRetweet, true);
+      })
     });
 
   });

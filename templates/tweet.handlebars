@@ -1,7 +1,7 @@
 <div class="tweet" data-tweet-id={{_id}} data-tweet-creator={{creator}} data-tweet-reblogger={{reblogger}}>
   {{#if isRetweet}}
-  <span style="color:blue">{{reblogger}} </span> <span>: {{content}}</span>
-  <span style="color: orange">Orignally by: </span> <span>  {{creator}} </span>
+  <span style="color:blue">{{reblogger}} </span> : <span style="color: orange"> @{{creator}} </span><span> {{content}}</span>
+  
   {{else}}
   <span style="color:blue">{{creator}} </span> <span>: {{content}}</span>
   {{/if}}
