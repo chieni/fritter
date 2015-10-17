@@ -102,22 +102,32 @@ var User = (function User() {
 		@param {string} followUser the username of the user that is to be followed
 	**/
 	that.followUser = function(username, followUser, callback){
-		userExists(followUser, function(exists){
-			if (exists){
-				UserModel.findOneAndUpdate({username:username},
-					{$push: {follows: followUser}}, 
-					{safe: true, upsert: true}, 
-						function(err, doc){
-						if (doc){
-							callback(null, doc);
-						} else {
-							callback({msg: 'Failed.'});
+		if (username === followUser){
+			callback({msg: 'You cannot follow yourself.'});
+		} else {
+			userExists(followUser, function(exists){
+				if (exists){
+					getUser(username, function(doc){
+						// If not already being followed
+						if (doc.follows.indexOf(followUser) < 0){
+							UserModel.findOneAndUpdate({username:username},
+								{$push: {follows: followUser}}, 
+								{safe: true, upsert: true}, 
+									function(err, doc){
+									if (doc){
+										callback(null, doc);
+									} else {
+										callback({msg: 'Failed.'});
+									}
+							});	
 						}
-				});
-			} else {
-				callback({msg: 'User does not exist.'});
-			}
-		});
+					});
+				} else {
+					callback({msg: 'User does not exist.'});
+				}
+			});
+		}
+
 	};
 
 	/**
