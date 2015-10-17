@@ -60,11 +60,31 @@
     var item = $(this).parent();
     var creator = item.data('tweet-creator');
     var reblogger = item.data('tweet-reblogger');
-    console.log('creator:', creator);
-    console.log('reblogger:',reblogger);
+    var toFollow = creator;
+    if (reblogger.length > 0){
+      toFollow = reblogger;
+    }
       $.post(
           '/users/follow',
-          { creator: creator, reblogger: reblogger }
+          { toFollow: toFollow }
+      ).done(function(response) {
+          loadHomePage();
+      }).fail(function(responseObject) {
+          var response = $.parseJSON(responseObject.responseText);
+          $('.error').text(response.err);
+      });
+  });
+
+  $(document).on('click', '#submit-follow', function(evt) {
+      var content = $('#follow-user-input').val();
+      if (content.trim().length === 0) {
+          alert('Input must not be empty');
+          return;
+      }
+
+      $.post(
+          '/users/follow',
+          { toFollow: content }
       ).done(function(response) {
           loadHomePage();
       }).fail(function(responseObject) {

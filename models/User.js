@@ -211,6 +211,8 @@ var User = (function User() {
 							callback({msg: 'Failed.'});
 						}
 				});
+			} else {
+				callback({msg: 'User does not exist.'});
 			}
 		});
 	};
