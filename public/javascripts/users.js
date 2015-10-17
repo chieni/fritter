@@ -54,4 +54,23 @@
           $('.error').text(response.err);
       });
   });
+
+  $(document).on('click', '.follow-tweet', function(evt){
+    evt.preventDefault();
+    var item = $(this).parent();
+    var creator = item.data('tweet-creator');
+    var reblogger = item.data('tweet-reblogger');
+    console.log('creator:', creator);
+    console.log('reblogger:',reblogger);
+      $.post(
+          '/users/follow',
+          { creator: creator, reblogger: reblogger }
+      ).done(function(response) {
+          loadHomePage();
+      }).fail(function(responseObject) {
+          var response = $.parseJSON(responseObject.responseText);
+          $('.error').text(response.err);
+      });
+  });
+
 })();

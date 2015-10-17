@@ -34,11 +34,20 @@ var requireContent = function(req, res, next) {
   of this particular resource will receive a 404.
 */
 var requireOwnership = function(req, res, next) {
-  if (!(req.currentUser.username === req.tweet.creator)) {
-    utils.sendErrResponse(res, 404, 'Resource not found.');
+  if (req.tweet.isRetweet){
+    if (!(req.currentUser.username === req.tweet.reblogger)) {
+      utils.sendErrResponse(res, 404, 'Resource not found.');
+    } else {
+      next();
+    }
   } else {
-    next();
+    if (!(req.currentUser.username === req.tweet.creator)) {
+      utils.sendErrResponse(res, 404, 'Resource not found.');
+    } else {
+      next();
+    }
   }
+
 };
 
 /*
@@ -58,7 +67,7 @@ router.param('tweet', function(req, res, next, tweetId) {
 
 // Register the middleware handlers above.
 router.all('*', requireAuthentication);
-router.all('/:tweet', requireOwnership);
+router.delete('/:tweet', requireOwnership);
 router.post('*', requireContent);
 /*
   At this point, all requests are authenticated and checked:
@@ -77,11 +86,11 @@ router.post('*', requireContent);
     - err: on failure, an error message
 */
 router.get('/', function(req, res) {
-  User.getAllTweets(req.currentUser.username, function(err, tweets) {
+  User.getAllTweets(req.currentUser.username, function(err, tweets, followingTweets) {
     if (err) {
       utils.sendErrResponse(res, 500, 'An unknown error occurred.');
     } else {
-      utils.sendSuccessResponse(res, { tweets: tweets });
+      utils.sendSuccessResponse(res, { tweets: tweets, followingTweets: followingTweets });
     }
   });
 });
@@ -99,6 +108,16 @@ router.post('/', function(req, res) {
     content: req.body.content,
     creator: req.currentUser.username
   }, function(err, tweet) {
+    if (err) {
+      utils.sendErrResponse(res, 500, err.msg);
+    } else {
+      utils.sendSuccessResponse(res);
+    }
+  });
+});
+
+router.post('/retweet', function(req, res) {
+  User.retweet(req.currentUser.username, req.body.content, function(err) {
     if (err) {
       utils.sendErrResponse(res, 500, err.msg);
     } else {

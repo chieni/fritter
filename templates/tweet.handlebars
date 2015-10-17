@@ -1,6 +1,18 @@
-<div class="tweet" data-tweet-id={{_id}}>
+<div class="tweet" data-tweet-id={{_id}} data-tweet-creator={{creator}} data-tweet-reblogger={{reblogger}}>
+  {{#if isRetweet}}
+  <span style="color:blue">{{reblogger}} </span> <span>: {{content}}</span>
+  <span style="color: orange">Orignally by: </span> <span>  {{creator}} </span>
+  {{else}}
   <span style="color:blue">{{creator}} </span> <span>: {{content}}</span>
+  {{/if}}
+
   {{#if canDelete}}
   <a href="#" class="delete-tweet">Delete</a>
   {{/if}}
+
+  {{#if canFollow}}
+  <a href="#" class="follow-tweet">Follow</a>
+  {{/if}}
+
+  <a href='#' class="retweet">Retweet</a>
 </div>

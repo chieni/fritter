@@ -10,11 +10,9 @@ var User = (function User() {
 	var Tweet = require('../models/Tweet');
 
 	var userSchema = mongoose.Schema({
-		_id: Number,
 		username: String,
 		password: String,
-		tweet_ids: [Number],
-		follow_ids: [Number]
+		follows: [String]
 
 	});
 
@@ -53,11 +51,9 @@ var User = (function User() {
 			} else {
 				UserModel.count({}, function(err, count){
 					UserModel.create({
-						_id: count,
 						username: username,
 						password: password,
-						tweet_ids: [],
-						follow_ids: []
+						follows: []
 					}, function(err, record){
 						if (err) {
 							console.log(err)
@@ -75,15 +71,9 @@ var User = (function User() {
 		@param {string} username the username to be searched for
 	**/
 	that.findByUsername = function (username, callback) {
-		userExists(username, function(exists){
-			if (exists){
-				getUser(username, function(user){
-					if (user){
-						callback(null, user);
-					} else {
-						callback({ msg : 'No such user!' });
-					}
-				});
+		getUser(username, function(user){
+			if (user){
+				callback(null, user);
 			} else {
 				callback({ msg : 'No such user!' });
 			}
@@ -97,18 +87,12 @@ var User = (function User() {
 		@param callback
 	**/
 	that.verifyPassword = function(username, candidatepw, callback) {
-		userExists(username, function(exists){
-			if (exists) {
-				getUser(username, function(user){
-				  if (candidatepw === user.password) {
-				    callback(null, true);
-				  } else {
-				    callback(null, false);
-				  }
-				});
-			} else {
-			  callback(null, false);
-			}
+		getUser(username, function(user){
+		  if (candidatepw === user.password) {
+		    callback(null, true);
+		  } else {
+		    callback(null, false);
+		  }
 		});
 	};
 
@@ -119,20 +103,16 @@ var User = (function User() {
 		@param callback
 	**/
 	that.addTweet = function(username, tweet, callback) {
-		userExists(username, function(exists){
-			if (exists) {
-				getUser(username, function(user){
-					Tweet.addTweet(tweet, function(success){
-						if (success){
-							callback(null);
-						} else {
-							callback({msg: 'Failed.'});
-						}
-					});
-				});
-			} else {
-			  callback({ msg : 'Invalid user.' });
-			}
+		getUser(username, function(user){
+			tweet.reblogger = "";
+			tweet.isRetweet = false;
+			Tweet.addTweet(tweet, function(success){
+				if (success){
+					callback(null);
+				} else {
+					callback({msg: 'Failed.'});
+				}
+			});
 		});
 	};
 
@@ -156,7 +136,6 @@ var User = (function User() {
 			  callback({ msg : 'Invalid user.'});
 			}
 		});
-
 
 	};
 
@@ -189,14 +168,12 @@ var User = (function User() {
 		@param callback
 	**/
 	that.getAllTweets = function(username, callback) {
-		userExists(username, function(exists){
-			if (exists){
-				Tweet.getAllTweets(username, function(tweets){
-					callback(false, tweets);
-				})
-			} else {
-				callback(true, { msg : 'Invalid user.' });
-			}
+		getUser(username, function(user){
+				Tweet.getAllTweets(username, user.follows, function(tweets){
+					Tweet.getFollowingTweets(user.follows, function(followingTweets){
+						callback(false, tweets, followingTweets);
+					});
+				});
 		});
 	};
 
@@ -217,6 +194,61 @@ var User = (function User() {
 				})
 			} else {
 				callback({ msg : 'Invalid user.' });
+			}
+		});
+	};
+
+	that.followUser = function(username, followUser, callback){
+		userExists(followUser, function(exists){
+			if (exists){
+				UserModel.findOneAndUpdate({username:username},
+					{$push: {follows: followUser}}, 
+					{safe: true, upsert: true}, 
+						function(err, doc){
+						if (doc){
+							callback(null);
+						} else {
+							callback({msg: 'Failed.'});
+						}
+				});
+			}
+		});
+	};
+
+	that.getFollowingTweets = function(username, callback){
+		getUser(username, function(user){
+			Tweet.getFollowingTweets(username, user.follows, function(tweets){
+				callback(tweets);
+			});
+		});
+	};
+
+	that.retweet = function(username, tweetId, callback){
+		userExists(username, function(exists){
+			if (exists) {
+			  Tweet.getTweet(tweetId, function(tweet){
+			  	if (tweet) {
+			  		newTweet = {
+						content: tweet.content,
+						creator: tweet.creator,
+						reblogger: username, 
+						canDelete: true,
+						canFollow: false,
+						isRetweet: true
+			  		}
+					Tweet.addTweet(newTweet, function(success){
+						if (success){
+							callback(null);
+						} else {
+							callback({msg: 'Failed to retweet.'});
+						}
+					});
+			  	} else {
+			  		callback( {msg: 'Invalid tweet.'});
+			  	}
+			  });
+			} else {
+			  callback({ msg : 'Invalid user.'});
 			}
 		});
 	};

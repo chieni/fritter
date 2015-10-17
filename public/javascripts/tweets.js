@@ -25,14 +25,27 @@
   $(document).on('click', '.delete-tweet', function(evt) {
     var item = $(this).parent();
     var id = item.data('tweet-id');
-    console.log(id);
     $.ajax({
         url: '/tweets/' + id,
         type: 'DELETE'
     }).done(function(response) {
         item.remove();
     }).fail(function(responseObject) {
-      console.log("FAIL")
+        var response = $.parseJSON(responseObject.responseText);
+        $('.error').text(response.err);
+    });
+  });
+
+  $(document).on('click', '.retweet', function(evt){
+    evt.preventDefault();
+    var item = $(this).parent();
+    var id = item.data('tweet-id');
+    $.post(
+        '/tweets/retweet',
+        { content: id }
+    ).done(function(response) {
+        loadHomePage();
+    }).fail(function(responseObject) {
         var response = $.parseJSON(responseObject.responseText);
         $('.error').text(response.err);
     });

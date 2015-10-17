@@ -30,19 +30,43 @@ templates['signin'] = template({"1":function(container,depth0,helpers,partials,d
     + "  </div>\n  <form id=\"signin-form\">\n    <div>Username: <input type=\"text\" name=\"username\" required /></div>\n    <div>Password: <input type=\"password\" name=\"password\" required /></div>\n    <input type=\"submit\" />\n  </form>\n</div>\n";
 },"useData":true});
 templates['tweet'] = template({"1":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "  <span style=\"color:blue\">"
+    + alias4(((helper = (helper = helpers.reblogger || (depth0 != null ? depth0.reblogger : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"reblogger","hash":{},"data":data}) : helper)))
+    + " </span> <span>: "
+    + alias4(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data}) : helper)))
+    + "</span>\n  <span style=\"color: orange\">Orignally by: </span> <span>  "
+    + alias4(((helper = (helper = helpers.creator || (depth0 != null ? depth0.creator : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"creator","hash":{},"data":data}) : helper)))
+    + " </span>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "  <span style=\"color:blue\">"
+    + alias4(((helper = (helper = helpers.creator || (depth0 != null ? depth0.creator : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"creator","hash":{},"data":data}) : helper)))
+    + " </span> <span>: "
+    + alias4(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data}) : helper)))
+    + "</span>\n";
+},"5":function(container,depth0,helpers,partials,data) {
     return "  <a href=\"#\" class=\"delete-tweet\">Delete</a>\n";
+},"7":function(container,depth0,helpers,partials,data) {
+    return "  <a href=\"#\" class=\"follow-tweet\">Follow</a>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
   return "<div class=\"tweet\" data-tweet-id="
     + alias4(((helper = (helper = helpers._id || (depth0 != null ? depth0._id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"_id","hash":{},"data":data}) : helper)))
-    + ">\n  <span style=\"color:blue\">"
+    + " data-tweet-creator="
     + alias4(((helper = (helper = helpers.creator || (depth0 != null ? depth0.creator : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"creator","hash":{},"data":data}) : helper)))
-    + " </span> <span>: "
-    + alias4(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"content","hash":{},"data":data}) : helper)))
-    + "</span>\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.canDelete : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "</div>\n";
+    + " data-tweet-reblogger="
+    + alias4(((helper = (helper = helpers.reblogger || (depth0 != null ? depth0.reblogger : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"reblogger","hash":{},"data":data}) : helper)))
+    + ">\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.isRetweet : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.canDelete : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.canFollow : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n  <a href='#' class=\"retweet\">Retweet</a>\n</div>\n";
 },"useData":true});
 templates['tweets'] = template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
@@ -55,8 +79,10 @@ templates['tweets'] = template({"1":function(container,depth0,helpers,partials,d
 
   return "<div id=\"tweets\">\n  <p>Welcome, "
     + container.escapeExpression(((helper = (helper = helpers.currentUser || (depth0 != null ? depth0.currentUser : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"currentUser","hash":{},"data":data}) : helper)))
-    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n\n  <h1>Tweets</h1>\n\n"
+    + " (<a href=\"#\" id=\"logout-link\">logout</a>)</p>\n  \n  <div>\n    <div class=\"error\"></div>\n    <label for=\"new-tweet-input\">Add a new tweet:</label>\n    <input type=\"text\" id=\"new-tweet-input\" />\n    <button id=\"submit-new-tweet\">Add</button>\n  </div>\n\n  <h1>All Tweets</h1>\n\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.tweets : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
+    + "\n  <h1>Following Tweets</h1>\n"
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.followingTweets : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "\n\n</div>\n";
 },"usePartial":true,"useData":true});
 })();

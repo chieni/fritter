@@ -21,7 +21,14 @@ mongoose.connect('mongodb://localhost/fritter-db');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
-    console.log("database connected");
+  // mongoose.connection.db.dropDatabase(
+  //   function (err, result) {
+  //     if(err){ console.log(err); }
+  //     else {
+  //       console.log('database connected');
+  //     }
+  //   }
+  // );
 });
 
 var app = express();

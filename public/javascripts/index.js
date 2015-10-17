@@ -25,7 +25,7 @@ var loadHomePage = function() {
 // Loads the home page of a logged in user, which displays all tweets.
 var loadTweetsPage = function() {
 	$.get('/tweets', function(response) {
-		loadPage('tweets', { tweets: response.content.tweets, currentUser: currentUser });
+		loadPage('tweets', { tweets: response.content.tweets, followingTweets: response.content.followingTweets, currentUser: currentUser });
 	});
 };
 

@@ -69,6 +69,21 @@ router.post('/logout', function(req, res) {
   }
 });
 
+router.post('/follow', function(req, res){
+  var toFollow;
+  if (req.body.reblogger.length > 0){
+    toFollow = req.body.reblogger;
+  } else {
+    toFollow = req.body.creator;
+  }
+  User.followUser(req.currentUser.username, toFollow, function(err) {
+    if (err) {
+      utils.sendErrResponse(res, 500, err.msg);
+    } else {
+      utils.sendSuccessResponse(res);
+    }
+  });
+});
 /*
   Create a new user in the system.
 

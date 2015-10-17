@@ -8,9 +8,16 @@
     <button id="submit-new-tweet">Add</button>
   </div>
 
-  <h1>Tweets</h1>
+  <h1>All Tweets</h1>
 
   {{#each tweets}}
+    {{> tweet}}
+  {{else}}
+    <p><em>No tweets yet!</em></p>
+  {{/each}}
+
+  <h1>Following Tweets</h1>
+  {{#each followingTweets}}
     {{> tweet}}
   {{else}}
     <p><em>No tweets yet!</em></p>
